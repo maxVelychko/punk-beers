@@ -1,13 +1,19 @@
 import React from "react";
 import { connect } from "react-redux";
+import { searchBeers, requestBeersByPage } from "../actions";
 
 class Home extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {value: ''};
+        this.state = {
+            value: "",
+            currentPage: 1,
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleNextPageClick = this.handleNextPageClick.bind(this);
+        this.handlePreviousPageClick = this.handlePreviousPageClick.bind(this);
     }
 
     handleChange(event) {
@@ -15,8 +21,22 @@ class Home extends React.Component {
     }
 
     handleSubmit(event) {
-        alert('A name was submitted: ' + this.state.value);
+        if (this.state.value) {
+            this.props.searchBeers(this.state.value);
+        }
         event.preventDefault();
+    }
+
+    handlePreviousPageClick() {
+        const previousPage = this.state.currentPage - 1;
+        this.setState({ currentPage: previousPage });
+        this.props.requestBeersByPage(previousPage);
+    }
+
+    handleNextPageClick() {
+        const nextPage = this.state.currentPage + 1;
+        this.setState({ currentPage: nextPage });
+        this.props.requestBeersByPage(nextPage);
     }
 
     render() {
@@ -27,9 +47,13 @@ class Home extends React.Component {
                     <input type="submit" value="Search for beer" />
                 </form>
                 <div>
+                    <button onClick={this.handlePreviousPageClick} disabled={this.state.currentPage === 1}>previous page</button>
+                    <button onClick={this.handleNextPageClick}>next page</button>
+                </div>
+                <div>
                     {this.props.beers.map(beer => {
                         return (
-                            <div>
+                            <div key={beer.id}>
                                 {beer.name}
                             </div>
                         )
@@ -44,9 +68,12 @@ const mapStateToProps = state => ({
     beers: state.beers,
 });
 
-// const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = (dispatch) => ({
+    searchBeers: (beerName) => dispatch(searchBeers(beerName)),
+    requestBeersByPage: (page) => dispatch(requestBeersByPage(page)),
+});
 
 export default connect(
     mapStateToProps,
-    null,
+    mapDispatchToProps,
 )(Home);

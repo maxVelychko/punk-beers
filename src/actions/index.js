@@ -19,7 +19,25 @@ function receiveBeers(json) {
 export function fetchBeers() {
     return dispatch => {
         dispatch(requestBeers());
-        return fetch(`https://api.punkapi.com/v2/beers?page=1&per_page=10`)
+        return fetch(`https://api.punkapi.com/v2/beers?page=3&per_page=10`)
+            .then(response => response.json())
+            .then(json => { dispatch(receiveBeers(json)) });
+    }
+}
+
+export function searchBeers(beerName) {
+    return dispatch => {
+        dispatch(requestBeers());
+        return fetch(`https://api.punkapi.com/v2/beers?beer_name=${beerName}`)
+            .then(response => response.json())
+            .then(json => { dispatch(receiveBeers(json)) });
+    }
+}
+
+export function requestBeersByPage(page) {
+    return dispatch => {
+        dispatch(requestBeers());
+        return fetch(`https://api.punkapi.com/v2/beers?page=${page}&per_page=10`)
             .then(response => response.json())
             .then(json => { dispatch(receiveBeers(json)) });
     }
